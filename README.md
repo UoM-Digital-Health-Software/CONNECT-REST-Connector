@@ -1,7 +1,7 @@
-# Kafka Connect REST Source and Fitbit Source
+# Kafka Connect REST Source and Fitbit Source (CONNECT FORK)
 
 This project contains a Kafka Connect source connector for a general REST API, and one for
-Fitbit in particular. The documentation of the Kafka Connect REST source still needs to be done.
+Fitbit in particular. The documentation of the Kafka Connect REST source still needs to be done.o
 
 ## Fitbit source connector
 
