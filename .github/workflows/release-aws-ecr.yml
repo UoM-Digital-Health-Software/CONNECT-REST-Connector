@@ -4,7 +4,7 @@ name: Release AWS ECR
 on:
   push:
     branches: 
-      - dev-brach
+      - dev-branch
 
 jobs:
   uploadBackend:
