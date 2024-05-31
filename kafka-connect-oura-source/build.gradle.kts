@@ -1,5 +1,20 @@
 description = "Kafka connector for Oura API source"
 
+repositories {
+    // Use jcenter for resolving dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+
+    mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/UoM-Digital-Health-Software/CONNECT-RADAR-Schemas")
+        credentials {
+            username =  "jindrich.gorner@manchester.ac.uk"
+            password =  "<secret>"
+        }
+    }
+}
+
+
 dependencies {
     api(project(":oura-library"))
     api("io.confluent:kafka-connect-avro-converter:${Versions.confluent}")

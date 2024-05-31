@@ -10,7 +10,7 @@ repositories {
         url = uri("https://maven.pkg.github.com/UoM-Digital-Health-Software/CONNECT-RADAR-Schemas")
         credentials {
             username =  "jindrich.gorner@manchester.ac.uk"
-            password =  "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"
+            password =  "<secret>"
         }
     }
 }
@@ -23,7 +23,7 @@ dependencies {
     api(project(":oura-library"))
     api("io.confluent:kafka-connect-avro-converter:${Versions.confluent}")
 
-    implementation("uk.ac.uom.dhs:radar-schemas-commons:0.8.5")
+    api("org.radarbase:radar-schemas-commons:${Versions.radarSchemas}")
 
 
 
