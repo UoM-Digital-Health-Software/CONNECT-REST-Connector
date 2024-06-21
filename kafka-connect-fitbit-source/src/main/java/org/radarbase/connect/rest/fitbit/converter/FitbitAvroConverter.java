@@ -84,13 +84,14 @@ public abstract class FitbitAvroConverter implements PayloadToSourceRecordConver
     double timeReceived = System.currentTimeMillis() / 1000d;
 
 
+
     ConnectDataLog fitbitLog = new ConnectDataLog();
     fitbitLog.setTime(timeReceived);
     fitbitLog.setDataGroupingType(GroupingType.PASSIVE_FITBIT);
-
+ //   return processRecords((FitbitRestRequest)restRequest, activities, timeReceived)
 
     SchemaAndValue avr = avroData.toConnectData(fitbitLog.getSchema(), fitbitLog);
-    SourceRecord logSourceRecord = new SourceRecord(null,null,"topic", key.schema(),key.value(),  avr.schema(), avr.value());
+    SourceRecord logSourceRecord = new SourceRecord(null,null,"connect_data_log", key.schema(),key.value(),  avr.schema(), avr.value());
 
 
     Collection<SourceRecord> records = processRecords((FitbitRestRequest)restRequest, activities, timeReceived)

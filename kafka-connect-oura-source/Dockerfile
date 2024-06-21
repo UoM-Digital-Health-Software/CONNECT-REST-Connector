@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+
+
 FROM --platform=$BUILDPLATFORM gradle:8.4-jdk17 as builder
 
 RUN mkdir /code
@@ -33,6 +36,14 @@ COPY ./oura-library/src/ /code/oura-library/src
 RUN gradle jar
 
 FROM confluentinc/cp-kafka-connect-base:7.5.0
+
+
+ USER root
+
+ RUN yum remove -y zulu11-ca-jdk-headless && yum remove -y zulu11-ca-jre-headless
+ RUN yum install -y zulu17-ca-jdk-headless && yum install -y zulu17-ca-jre-headless
+
+ USER appuser
 
 MAINTAINER Pauline Conde <pauline.conde@kcl.ac.uk>
 
