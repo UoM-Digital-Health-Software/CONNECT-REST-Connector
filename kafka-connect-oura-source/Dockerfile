@@ -17,6 +17,12 @@
 
 FROM --platform=$BUILDPLATFORM gradle:8.4-jdk17 as builder
 
+# Define an ARG variable to accept the build-time argument
+ARG key_package
+
+# Use the ARG variable to set an ENV variable
+ENV key_package=${key_package}
+
 RUN mkdir /code
 WORKDIR /code
 
