@@ -10,7 +10,7 @@ pluginManagement {
             url = uri("https://maven.pkg.github.com/UoM-Digital-Health-Software/CONNECT-RADAR-Schemas")
             credentials {
                 username =  "jindrich.gorner@manchester.ac.uk"
-                password =  "<secret>"
+                password =  System.getenv("key_package")
             }
         }
         gradlePluginPortal()

@@ -144,10 +144,13 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
 
   @Override
   public void requestSucceeded(RestRequest request, SourceRecord record) {
-    lastPollPerUser.put(((FitbitRestRequest) request).getUser().getId(), lastPoll);
-    String userKey = ((FitbitRestRequest) request).getUser().getVersionedId();
-    Instant offset = Instant.ofEpochMilli((Long) record.sourceOffset().get(TIMESTAMP_OFFSET_KEY));
-    offsets.put(userKey, offset);
+    if(record.topic() != "connect_data_log") {
+      lastPollPerUser.put(((FitbitRestRequest) request).getUser().getId(), lastPoll);
+      String userKey = ((FitbitRestRequest) request).getUser().getVersionedId();
+
+      Instant offset = Instant.ofEpochMilli((Long) record.sourceOffset().get(TIMESTAMP_OFFSET_KEY));
+      offsets.put(userKey, offset);
+    }
   }
 
   @Override
@@ -180,7 +183,7 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
       logger.info("Too many requests for user {}. Backing off until {}",
           user, backOff.plus(getPollIntervalPerUser()));
     } else {
-      logger.warn("Failed to make request {}", request);
+      logger.warn("Failed to make request in FitbitPollingRoute {}", request);
     }
   }
 

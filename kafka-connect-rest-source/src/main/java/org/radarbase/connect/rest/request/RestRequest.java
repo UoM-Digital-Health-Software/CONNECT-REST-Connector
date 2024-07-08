@@ -28,11 +28,16 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.apache.kafka.connect.source.SourceRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Single request. This must originate from a RequestRoute and have a predefined source partition.
  */
 public class RestRequest {
+
+  private static final Logger logger = LoggerFactory.getLogger(RestRequest.class);
+
   private final Request request;
   private final Map<String, Object> partition;
   private final RequestRoute route;
@@ -96,6 +101,8 @@ public class RestRequest {
       ResponseBody body = response.body();
       data = body != null ? body.bytes() : null;
     } catch (IOException ex) {
+      logger.warn("RestRequest error: {}", ex);
+
       route.requestFailed(this, null);
       throw ex;
     }
