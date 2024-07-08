@@ -77,6 +77,6 @@ jobs:
           REPOSITORY: connect-fitbit-connector
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -f ./kafka-connect-fitbit-source/Dockerfile  --build-arg key_package=${{ secrets.GITHUB_SECRET }} -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker build -f ./kafka-connect-fitbit-source/Dockerfile  --build-arg key_package=${{ secrets.CONNECT_SECRET }} -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker image inspect $REGISTRY/$REPOSITORY:$IMAGE_TAG
