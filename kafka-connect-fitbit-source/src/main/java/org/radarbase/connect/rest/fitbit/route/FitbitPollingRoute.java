@@ -95,6 +95,7 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
   protected static final Duration LOOKBACK_TIME = Duration.ofDays(1); // 1 day
   protected static final long HISTORICAL_TIME_DAYS = 14L;
   protected static final Duration ONE_DAY = DAYS.getDuration();
+  protected static final Duration THIRTY_DAYS = Duration.ofDays(30);
   protected static final Duration ONE_NANO = NANOS.getDuration();
   protected static final TemporalAmount ONE_SECOND = SECONDS.getDuration();
   protected static final TemporalAmount ONE_MINUTE = MINUTES.getDuration();
@@ -143,10 +144,13 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
 
   @Override
   public void requestSucceeded(RestRequest request, SourceRecord record) {
-    lastPollPerUser.put(((FitbitRestRequest) request).getUser().getId(), lastPoll);
-    String userKey = ((FitbitRestRequest) request).getUser().getVersionedId();
-    Instant offset = Instant.ofEpochMilli((Long) record.sourceOffset().get(TIMESTAMP_OFFSET_KEY));
-    offsets.put(userKey, offset);
+    if(record.topic() != "connect_data_log") {
+      lastPollPerUser.put(((FitbitRestRequest) request).getUser().getId(), lastPoll);
+      String userKey = ((FitbitRestRequest) request).getUser().getVersionedId();
+
+      Instant offset = Instant.ofEpochMilli((Long) record.sourceOffset().get(TIMESTAMP_OFFSET_KEY));
+      offsets.put(userKey, offset);
+    }
   }
 
   @Override
@@ -179,7 +183,7 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
       logger.info("Too many requests for user {}. Backing off until {}",
           user, backOff.plus(getPollIntervalPerUser()));
     } else {
-      logger.warn("Failed to make request {}", request);
+      logger.warn("Failed to make request in FitbitPollingRoute {}", response);
     }
   }
 
@@ -326,7 +330,7 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
   }
 
   /**
-   * Generate one date per day, using UTC time zone. The first date will have the time from the
+   * Generate one date per day (or specified rangeInterval), using UTC time zone. The first date will have the time from the
    * given startDate. Following time stamps will start at 00:00. This will not up to the date of
    * {@link #getLookbackTime()} (exclusive).
    */
@@ -345,12 +349,12 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
         return Stream.empty();
       }
     } else {
-      long numElements = DAYS.between(startDate, lookBack);
+      Duration rangeInterval = getDateRangeInterval();
 
       Stream<DateRange> elements = Stream
-          .iterate(dateTime, t -> t.plus(ONE_DAY).truncatedTo(DAYS))
-          .limit(numElements)
-          .map(s -> new DateRange(s, s.plus(ONE_DAY).truncatedTo(DAYS).minus(ONE_NANO)));
+          .iterate(dateTime, t -> t.plus(rangeInterval).truncatedTo(DAYS))
+          .takeWhile(u -> u.isBefore(lookBackDateStart))
+          .map(s -> new DateRange(s, s.plus(rangeInterval).truncatedTo(DAYS).minus(ONE_NANO)));
 
       // we're polling at exactly 00:00, should not poll the last date
       if (lookBackDateStart.equals(lookBackDate)) {
@@ -361,5 +365,9 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
             Stream.of(new DateRange(lookBackDateStart, lookBackDate)));
       }
     }
+  }
+
+  Duration getDateRangeInterval() {
+    return ONE_DAY;
   }
 }

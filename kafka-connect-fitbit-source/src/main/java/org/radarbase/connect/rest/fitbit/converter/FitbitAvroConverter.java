@@ -42,8 +42,11 @@ import org.radarbase.connect.rest.converter.PayloadToSourceRecordConverter;
 import org.radarbase.connect.rest.fitbit.request.FitbitRestRequest;
 import org.radarbase.connect.rest.fitbit.user.User;
 import org.radarbase.connect.rest.request.RestRequest;
+import org.radarcns.active.connect.GroupingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.radarcns.active.connect.ConnectDataLog;
 
 /**
  * Abstract class to help convert Fitbit data to Avro Data.
@@ -80,7 +83,18 @@ public abstract class FitbitAvroConverter implements PayloadToSourceRecordConver
     final SchemaAndValue key = user.getObservationKey(avroData);
     double timeReceived = System.currentTimeMillis() / 1000d;
 
-    return processRecords((FitbitRestRequest)restRequest, activities, timeReceived)
+
+
+    ConnectDataLog fitbitLog = new ConnectDataLog();
+    fitbitLog.setTime(timeReceived);
+    fitbitLog.setDataGroupingType(GroupingType.PASSIVE_FITBIT);
+ //   return processRecords((FitbitRestRequest)restRequest, activities, timeReceived)
+
+    SchemaAndValue avr = avroData.toConnectData(fitbitLog.getSchema(), fitbitLog);
+    SourceRecord logSourceRecord = new SourceRecord(null,null,"connect_data_log", key.schema(),key.value(),  avr.schema(), avr.value());
+
+
+    Collection<SourceRecord> records = processRecords((FitbitRestRequest)restRequest, activities, timeReceived)
         .filter(t -> validateRecord((FitbitRestRequest)restRequest, t))
         .map(t -> {
           SchemaAndValue avro = avroData.toConnectData(t.value.getSchema(), t.value);
@@ -91,6 +105,10 @@ public abstract class FitbitAvroConverter implements PayloadToSourceRecordConver
               key.schema(), key.value(), avro.schema(), avro.value());
         })
         .collect(Collectors.toList());
+
+    records.add(logSourceRecord);
+
+    return records;
   }
 
   private boolean validateRecord(FitbitRestRequest request, TopicData record) {

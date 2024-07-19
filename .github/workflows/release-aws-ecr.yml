@@ -1,0 +1,82 @@
+# Create release files
+name: Release AWS ECR
+
+on:
+  push:
+    branches: 
+      - dev-branch
+
+jobs:
+  uploadBackend:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Gradle cache
+        uses: actions/cache@v3
+        with:
+          # Cache gradle directories
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          # An explicit key for restoring and saving the cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradlew', '**/*.gradle', 'gradle.properties', 'gradle/**') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Compile code
+      - name: Compile code
+        run: ./gradlew jar
+
+      # Upload it to GitHub
+      - name: Upload to GitHub
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: "*/build/libs/*"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Build and push tagged release docker image
+  docker:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v3
+
+      # Setup docker build environment
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2 # More information on this action can be found below in the 'AWS Credentials' section
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+          
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+                
+      - name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: connect-fitbit-connector
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -f ./kafka-connect-fitbit-source/Dockerfile  --build-arg key_package=${{ secrets.CONNECT_SECRET }} -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker image inspect $REGISTRY/$REPOSITORY:$IMAGE_TAG
