@@ -183,7 +183,7 @@ public abstract class FitbitPollingRoute implements PollingRequestRoute {
       logger.info("Too many requests for user {}. Backing off until {}",
           user, backOff.plus(getPollIntervalPerUser()));
     } else {
-      logger.warn("Failed to make request in FitbitPollingRoute {}", request);
+      logger.warn("Failed to make request in FitbitPollingRoute {}", response);
     }
   }
 
