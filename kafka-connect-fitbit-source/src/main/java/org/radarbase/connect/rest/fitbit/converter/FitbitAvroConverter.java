@@ -106,7 +106,25 @@ public abstract class FitbitAvroConverter implements PayloadToSourceRecordConver
         })
         .collect(Collectors.toList());
 
-    records.add(logSourceRecord);
+
+
+    // don't add log if records only time_zone/steps
+    try {
+      var sendLog = false;
+      for (SourceRecord sourceRecord : records) {
+        if(!sourceRecord.topic().equals("connect_fitbit_intraday_steps")  && !sourceRecord.topic().equals("connect_fitbit_time_zone")) {
+          sendLog = true;
+        }
+      }
+
+      if(sendLog) {
+        records.add(logSourceRecord);
+      }
+    }
+    catch(Exception e) {
+      logger.warn("Failed at adding a system log", e);
+    }
+
 
     return records;
   }
