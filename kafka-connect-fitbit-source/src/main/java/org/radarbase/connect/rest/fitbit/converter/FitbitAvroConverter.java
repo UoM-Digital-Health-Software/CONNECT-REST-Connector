@@ -112,7 +112,7 @@ public abstract class FitbitAvroConverter implements PayloadToSourceRecordConver
     try {
       var sendLog = false;
       for (SourceRecord sourceRecord : records) {
-        if(sourceRecord.topic().equals("connect_fitbit_intraday_heart_rate")) {
+        if(sourceRecord.topic().contains("connect_fitbit_intraday_heart_rate")) {
           sendLog = true;
         }
       }
