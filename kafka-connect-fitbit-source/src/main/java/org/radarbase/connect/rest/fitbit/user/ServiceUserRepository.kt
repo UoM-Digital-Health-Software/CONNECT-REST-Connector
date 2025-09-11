@@ -61,6 +61,7 @@ import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Stream
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toKotlinDuration
@@ -90,6 +91,8 @@ class ServiceUserRepository : UserRepository {
             tokenUrl = URLBuilder(config.fitbitUserRepositoryTokenUrl.toString()).build(),
             clientId = config.fitbitUserRepositoryClientId,
             clientSecret = config.fitbitUserRepositoryClientSecret,
+            scope = "SUBJECT.READ MEASUREMENT.CREATE",
+            audience = "res_restAuthorizer",
         )
 
         val refreshDuration = config.userCacheRefreshInterval.toKotlinDuration()
@@ -113,6 +116,8 @@ class ServiceUserRepository : UserRepository {
         tokenUrl: Url?,
         clientId: String?,
         clientSecret: String?,
+        scope: String?,
+        audience: String?,
     ): HttpClient = HttpClient(CIO) {
         if (tokenUrl != null) {
             install(Auth) {
@@ -121,6 +126,8 @@ class ServiceUserRepository : UserRepository {
                         tokenUrl.toString(),
                         clientId,
                         clientSecret,
+                        scope,
+                        audience,
                     ).copyWithEnv("MANAGEMENT_PORTAL"),
                     baseUrl.host,
                 )
@@ -228,7 +235,7 @@ class ServiceUserRepository : UserRepository {
         }
 
     override fun hasPendingUpdates(): Boolean = runBlocking(Dispatchers.Default) {
-        userCache.isStale()
+        userCache.isStale(1.hours)
     }
 
     @Throws(IOException::class)

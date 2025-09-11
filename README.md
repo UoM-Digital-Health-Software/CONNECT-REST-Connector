@@ -1,7 +1,19 @@
 # Kafka Connect REST Source and Fitbit Source (CONNECT FORK)
 
-This project contains a Kafka Connect source connector for a general REST API, and one for
-Fitbit in particular. The documentation of the Kafka Connect REST source still needs to be done.o
+This project contains a Kafka Connect source connector for a general REST API, for
+specific Fitbit and Oura devices. The documentation of the Kafka Connect REST source still needs to
+be done.
+
+<!-- TOC -->
+
+* [Kafka Connect REST Source and Fitbit Source](#kafka-connect-rest-source-and-fitbit-source)
+  * [Fitbit source connector](#fitbit-source-connector)
+    * [Installation](#installation)
+    * [Usage](#usage)
+  * [Sentry monitoring](#sentry-monitoring)
+  * [Contributing](#contributing)
+
+<!-- TOC -->
 
 ## Fitbit source connector
 
@@ -12,7 +24,9 @@ of Java 17 or later.
 
 ### Usage
 
-Generally, this component is installed with [RADAR-Kubernetes](https://github.com/RADAR-base/RADAR-Kubernetes). It uses Docker image [radarbase/kafka-connect-rest-fitbit-source](https://hub.docker.com/r/radarbase/kafka-connect-rest-fitbit-source).
+Generally, this component is installed
+with [RADAR-Kubernetes](https://github.com/RADAR-base/RADAR-Kubernetes). It uses Docker
+image [radarbase/kafka-connect-rest-fitbit-source](https://hub.docker.com/r/radarbase/kafka-connect-rest-fitbit-source).
 
 First, [register a Fitbit App](https://dev.fitbit.com/apps) with Fitbit. It should be either a
 server app, for multiple users, or a personal app for a single user. With the server app, you need
@@ -22,7 +36,8 @@ For every Fitbit user you want access to, copy `docker/fitbit-user.yml.template`
 `docker/users/`. Get an access token and refresh token for the user using for example the
 [Fitbit OAuth 2.0 tutorial page](https://dev.fitbit.com/apps/oauthinteractivetutorial).
 
-For automatic configuration for multiple users, please take a look at `scripts/REDCAP-FITBIT-AUTH-AUTO/README.md`.
+For automatic configuration for multiple users, please take a look at
+`scripts/REDCAP-FITBIT-AUTH-AUTO/README.md`.
 
 Copy `docker/source-fitbit.properties.template` to `docker/source-fitbit.properties` and enter
 your Fitbit App client ID and client secret. The following tables shows the possible properties.
@@ -77,24 +92,53 @@ your Fitbit App client ID and client secret. The following tables shows the poss
 <tr>
 <td>fitbit.intraday.steps.topic</td><td>Topic for Fitbit intraday steps</td><td>string</td><td>connect_fitbit_intraday_steps</td><td>non-empty string without control characters</td><td>low</td></tr>
 <tr>
+<td>fitbit.intraday.steps.enabled</td><td>Config to enable or disable intraday steps</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
 <td>fitbit.intraday.heart.rate.topic</td><td>Topic for Fitbit intraday heart_rate</td><td>string</td><td>connect_fitbit_intraday_heart_rate</td><td>non-empty string without control characters</td><td>low</td></tr>
+<tr>
+<td>fitbit.intraday.heart.rate.enabled</td><td>Config to enable or disable intraday heart rate</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
+<td>fitbit.intraday.heart.rate.variability.enabled</td><td>Config to enable or disable intraday heart rate variability</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
+<td>fitbit.resting.heart.rate.enabled</td><td>Config to enable or disable resting heart rate</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
 <tr>
 <td>fitbit.sleep.stages.topic</td><td>Topic for Fitbit sleep stages</td><td>string</td><td>connect_fitbit_sleep_stages</td><td>non-empty string without control characters</td><td>low</td></tr>
 <tr>
+<td>fitbit.sleep.stages.enabled</td><td>Config to enable or disable sleep stages</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
 <td>fitbit.sleep.classic.topic</td><td>Topic for Fitbit sleep classic data</td><td>string</td><td>connect_fitbit_sleep_classic</td><td>non-empty string without control characters</td><td>low</td></tr>
+<tr>
+<td>fitbit.sleep.classic.enabled</td><td>Config to enable or disable sleep classic</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
 <tr>
 <td>fitbit.time.zone.topic</td><td>Topic for Fitbit profile time zone</td><td>string</td><td>connect_fitbit_time_zone</td><td>non-empty string without control characters</td><td>low</td></tr>
 <tr>
+<td>fitbit.time.zone.enabled</td><td>Config to enable or disable time zone</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
 <td>fitbit.activity.log.topic</td><td>Topic for Fitbit activity log.</td><td>string</td><td>connect_fitbit_activity_log</td><td>non-empty string without control characters</td><td>low</td></tr>
 <tr>
+<td>fitbit.activity.log.enabled</td><td>Config to enable or disable the activity log</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
 <td>fitbit.intraday.calories.topic</td><td>Topic for Fitbit intraday calories</td><td>string</td><td>connect_fitbit_intraday_calories</td><td>non-empty string without control characters</td><td>low</td></tr>
+<tr>
+<td>fitbit.intraday.calories.enabled</td><td>Config to enable or disable intraday calories</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
+<td>fitbit.intraday.spo2.enabled</td><td>Config to enable or disable intraday spo2</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
+<td>fitbit.breathing.rate.enabled</td><td>Config to enable or disable breathing rate</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
+<td>fitbit.skin.temperature.enabled</td><td>Config to enable or disable skin temperature</td><td>boolean</td><td>true</td><td></td><td>low</td></tr>
+<tr>
+<td>fitbit.request.max.forbidden</td><td>Maximum number of consecutive forbidden responses before backing off</td><td>int</td><td>3</td><td></td><td>medium</td></tr>
+<tr>
+<td>fitbit.request.forbidden.backoff.s</td><td>Backoff time in seconds between forbidden requests</td><td>int</td><td>86400</td><td></td><td>medium</td></tr>
 <tr>
 <td>fitbit.user.firebase.collection.fitbit.name</td><td>Firestore Collection for retrieving Fitbit Auth details. Only used when a Firebase based user repository is used.</td><td>string</td><td>fitbit</td><td></td><td>low</td></tr>
 <tr>
 <td>fitbit.user.firebase.collection.user.name</td><td>Firestore Collection for retrieving User details. Only used when a Firebase based user repository is used.</td><td>string</td><td>users</td><td></td><td>low</td></tr>
 </tbody></table>
 
-If the ManagementPortal is used to authenticate against the user repository, please add an OAuth client to ManagementPortal with the following properties:
+If the ManagementPortal is used to authenticate against the user repository, please add an OAuth
+client to ManagementPortal with the following properties:
 
 ```
 Client ID: fitbit.user.repository.client.id
@@ -106,7 +150,8 @@ Access Token validity: 600
 Refresh Token validity: 0
 ```
 
-Finally set the `fitbit.user.repository.oauth.token.url` to `http://managementportal-app:8080/managementportal/oauth/token`.
+Finally set the `fitbit.user.repository.oauth.token.url` to
+`http://managementportal-app:8080/managementportal/oauth/token`.
 
 Now you can run a full Kafka stack using
 
@@ -163,7 +208,29 @@ sequenceDiagram
   connector ->> connector: Update offset times
 ```
 
+## Sentry monitoring
+
+To enable Sentry monitoring for the generic REST, Fitbit, or Oura source connector service:
+
+1. Set a `SENTRY_DSN` environment variable that points to the desired Sentry DSN.
+2. (Optional) Set the `SENTRY_LOG_LEVEL` environment variable to control the minimum log level of
+   events sent to Sentry.
+   The default log level for Sentry is `ERROR`. Possible values are `TRACE`, `DEBUG`, `INFO`, `WARN`,
+   and `ERROR`.
+
+For further configuration of Sentry via environmental variables see [here](https://docs.sentry.io/platforms/java/configuration/#configuration-via-the-runtime-environment). For instance:
+
+```
+SENTRY_LOG_LEVEL: 'ERROR'
+SENTRY_DSN: 'https://000000000000.ingest.de.sentry.io/000000000000'
+SENTRY_ATTACHSTACKTRACE: true
+SENTRY_STACKTRACE_APP_PACKAGES: io.confluent.connect,org.radarbase.connect.rest
+```
+
 ## Contributing
 
-Code should be formatted using the [Google Java Code Style Guide](https://google.github.io/styleguide/javaguide.html).
-If you want to contribute a feature or fix browse our [issues](https://github.com/RADAR-base/RADAR-REST-Connector/issues), and please make a pull request.
+Code should be formatted using
+the [Google Java Code Style Guide](https://google.github.io/styleguide/javaguide.html).
+If you want to contribute a feature or fix browse
+our [issues](https://github.com/RADAR-base/RADAR-REST-Connector/issues), and please make a pull
+request.
