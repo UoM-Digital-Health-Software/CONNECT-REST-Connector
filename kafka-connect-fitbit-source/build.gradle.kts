@@ -29,7 +29,6 @@ dependencies {
     api("org.radarbase:radar-schemas-commons:${Versions.radarSchemas}")
 
     implementation("org.radarbase:radar-commons-kotlin:${Versions.radarCommons}")
-    implementation("org.radarbase:oauth-client-util:${Versions.managementPortal}")
 
     api("com.squareup.okhttp3:okhttp:${Versions.okhttp}")
     implementation(platform("com.fasterxml.jackson:jackson-bom:${Versions.jackson}"))
