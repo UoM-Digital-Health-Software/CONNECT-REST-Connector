@@ -1,5 +1,13 @@
 # Kafka Connect REST Source and Fitbit Source (CONNECT FORK)
 
+
+
+Please refer to here for any other CONNECT related documentation: 
+
+```
+https://github.com/UoM-Digital-Health-Software/CONNECT/tree/main/mobile/CONNECT_DOCS
+```
+
 This project contains a Kafka Connect source connector for a general REST API, for
 specific Fitbit and Oura devices. The documentation of the Kafka Connect REST source still needs to
 be done.
