@@ -23,6 +23,37 @@ be done.
 
 <!-- TOC -->
 
+
+## Publish as a docker image (CONNECT)
+
+If you want to create a docker image of this repo then you need to run the following command: 
+
+
+```
+docker buildx build \
+  -f "kafka-connect-fitbit-source/Dockerfile" \
+  --tag <docker_user>/kafka-connect-rest-fitbit-source:<tag> \
+  --platform linux/arm64,linux/amd64 \
+  --push \
+  --build-arg key_package="$key_package" \
+  .
+  
+ 
+```
+ 
+ 
+Replace **docker_user** with your docker username 
+
+Replace **tag** with whatever tag you want to name this as 
+ 
+Replace **key_package** with a token created in your Github settings that allows to create and retrieve packages. 
+
+Also before running this command, search for "jindrich.gorner@manchester.ac.uk" throughout the repo and replace with your own Github username
+ 
+ 
+ 
+
+
 ## Fitbit source connector
 
 ### Installation
